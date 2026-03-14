@@ -7,10 +7,29 @@ import type {
   Workflows,
   DeepDives,
   ContentData,
+  DocManifest,
 } from '../types';
 
+let currentDocSet = '';
+
+export async function loadDocManifest(): Promise<DocManifest> {
+  const response = await fetch('/docs/manifest.json');
+  if (!response.ok) {
+    throw new Error('Failed to load documentation manifest');
+  }
+  return response.json();
+}
+
+export function setCurrentDocSet(docSetPath: string): void {
+  currentDocSet = docSetPath;
+}
+
+export function getContentBasePath(): string {
+  return currentDocSet ? `/docs/${currentDocSet}` : '/content';
+}
+
 export async function loadMetadata(): Promise<Metadata> {
-  const response = await fetch('/content/metadata.json');
+  const response = await fetch(`${getContentBasePath()}/metadata.json`);
   if (!response.ok) {
     throw new Error('Failed to load metadata');
   }
@@ -18,7 +37,7 @@ export async function loadMetadata(): Promise<Metadata> {
 }
 
 export async function loadOverview(): Promise<string> {
-  const response = await fetch('/content/overview.md');
+  const response = await fetch(`${getContentBasePath()}/overview.md`);
   if (!response.ok) {
     throw new Error('Failed to load overview');
   }
@@ -27,7 +46,7 @@ export async function loadOverview(): Promise<string> {
 }
 
 export async function loadTechStack(): Promise<TechStack> {
-  const response = await fetch('/content/tech-stack.json');
+  const response = await fetch(`${getContentBasePath()}/tech-stack.json`);
   if (!response.ok) {
     throw new Error('Failed to load tech stack');
   }
@@ -35,7 +54,7 @@ export async function loadTechStack(): Promise<TechStack> {
 }
 
 export async function loadArchitecture(): Promise<Architecture> {
-  const response = await fetch('/content/architecture.json');
+  const response = await fetch(`${getContentBasePath()}/architecture.json`);
   if (!response.ok) {
     throw new Error('Failed to load architecture');
   }
@@ -43,7 +62,7 @@ export async function loadArchitecture(): Promise<Architecture> {
 }
 
 export async function loadComponents(): Promise<Components> {
-  const response = await fetch('/content/components.json');
+  const response = await fetch(`${getContentBasePath()}/components.json`);
   if (!response.ok) {
     throw new Error('Failed to load components');
   }
@@ -51,7 +70,7 @@ export async function loadComponents(): Promise<Components> {
 }
 
 export async function loadWorkflows(): Promise<Workflows> {
-  const response = await fetch('/content/workflows.json');
+  const response = await fetch(`${getContentBasePath()}/workflows.json`);
   if (!response.ok) {
     throw new Error('Failed to load workflows');
   }
@@ -59,7 +78,7 @@ export async function loadWorkflows(): Promise<Workflows> {
 }
 
 export async function loadDeepDives(): Promise<DeepDives> {
-  const response = await fetch('/content/deep-dives.json');
+  const response = await fetch(`${getContentBasePath()}/deep-dives.json`);
   if (!response.ok) {
     throw new Error('Failed to load deep dives');
   }
@@ -67,7 +86,7 @@ export async function loadDeepDives(): Promise<DeepDives> {
 }
 
 export async function loadSetup(): Promise<string> {
-  const response = await fetch('/content/setup.md');
+  const response = await fetch(`${getContentBasePath()}/setup.md`);
   if (!response.ok) {
     throw new Error('Failed to load setup guide');
   }

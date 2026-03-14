@@ -44,6 +44,30 @@ function App() {
     );
   }
 
+  const handleContentChange = (newContent: any) => {
+    setContent(newContent);
+    setError(null);
+  };
+
+  const handleLoadingChange = (isLoading: boolean) => {
+    setLoading(isLoading);
+  };
+
+  const handleErrorChange = (newError: string | null) => {
+    setError(newError);
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+        <div className="text-center">
+          <Loader2 className="w-12 h-12 animate-spin text-blue-600 dark:text-blue-400 mx-auto mb-4" />
+          <p className="text-gray-600 dark:text-gray-300">Loading documentation...</p>
+        </div>
+      </div>
+    );
+  }
+
   if (error || !content) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 p-4">
@@ -69,7 +93,12 @@ function App() {
 
   return (
     <Router>
-      <Layout metadata={content.metadata}>
+      <Layout
+        metadata={content.metadata}
+        onContentChange={handleContentChange}
+        onLoadingChange={handleLoadingChange}
+        onErrorChange={handleErrorChange}
+      >
         <Routes>
           <Route
             path="/"

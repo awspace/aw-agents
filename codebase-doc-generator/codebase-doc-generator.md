@@ -50,16 +50,26 @@ The codebase-doc-generator agent analyzes codebases and generates comprehensive,
 - Identify key features and their implementations
 - Extract setup, installation, and usage instructions
 
+### Step 3: Pre-Generation Check
+- Generate a unique identifier for the current codebase using: `{project-name}-{YYYYMMDD}-{git-hash}` (if git repo) or `{project-name}-{YYYYMMDD}` (if not)
+- Check the `docs/` directory for existing documentation sets matching this identifier
+- If matching docs exist: prompt the user whether to use existing docs or regenerate
+- If user chooses to use existing docs: skip generation and load existing content
+
 ### Step 4: Content Generation
 - Generate all structured content files according to the schema below
 - Ensure content is accurate, comprehensive, and educational
 - Include Mermaid diagrams for architecture and workflows
+- Pre-render all Mermaid diagrams to static SVG using @mermaid-js/mermaid-cli and include in the JSON
 - Add code examples with explanations for key functionality
+- Save all generated files to `website/public/docs/{unique-id}/` directory
+- Update `docs/manifest.json` to add the new documentation set to the list
+- Update the `content` symlink to point to the newly generated documentation set
+- Set `activeDocSet` in the manifest to the newly generated ID
 
 ### Step 5: Website Build and Delivery
-- Place generated content in the website's public/content directory
 - Install website dependencies if needed
-- Build the static website
+- Build the static website (automatically copies all doc sets to dist/)
 - Serve the website locally and provide a clickable URL for viewing
 - Optionally export the built site to a user-specified directory
 
@@ -129,7 +139,8 @@ All generated content follows these strict schemas to ensure compatibility with 
     {
       "name": "string",
       "description": "string",
-      "mermaidSyntax": "string"
+      "mermaidSyntax": "string",
+      "preRenderedSvg": "string | null"
     }
   ],
   "layers": [
@@ -177,7 +188,8 @@ All generated content follows these strict schemas to ensure compatibility with 
           "action": "string"
         }
       ],
-      "diagramMermaid": "string | null"
+      "diagramMermaid": "string | null",
+      "preRenderedSvg": "string | null"
     }
   ]
 }

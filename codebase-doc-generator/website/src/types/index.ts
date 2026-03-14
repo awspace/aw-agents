@@ -45,6 +45,7 @@ export interface MermaidDiagram {
   name: string;
   description: string;
   mermaidSyntax: string;
+  preRenderedSvg?: string;
 }
 
 export interface ArchitectureLayer {
@@ -89,6 +90,7 @@ export interface Workflow {
   trigger: string;
   steps: WorkflowStep[];
   diagramMermaid: string | null;
+  preRenderedSvg?: string;
 }
 
 export interface Workflows {
@@ -112,6 +114,19 @@ export interface Feature {
 
 export interface DeepDives {
   features: Feature[];
+}
+
+export interface DocSet {
+  id: string;
+  name: string;
+  description: string;
+  generatedDate: string;
+  path: string;
+}
+
+export interface DocManifest {
+  docSets: DocSet[];
+  activeDocSet: string;
 }
 
 export interface ContentData {

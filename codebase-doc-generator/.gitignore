@@ -5,6 +5,11 @@ website/node_modules/
 website/dist/
 website/build/
 
+# Generated documentation content (user-specific, not tracked)
+website/public/docs/*
+!website/public/docs/manifest.json  # Keep manifest template
+website/public/content  # Symlink to active doc set
+
 # Environment files
 .env
 .env.local
@@ -66,3 +71,7 @@ lerna-debug.log*
 
 # TernJS port file
 .tern-port
+
+# Temporary files
+*.tmp
+*.temp

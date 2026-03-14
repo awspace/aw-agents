@@ -73,7 +73,7 @@ const Workflows: React.FC<WorkflowsProps> = ({ workflows }) => {
             {workflow.diagramMermaid && (
               <div>
                 <h3 className="text-lg font-semibold mb-4">Workflow Diagram</h3>
-                <DiagramRenderer diagram={workflow.diagramMermaid} />
+                <DiagramRenderer diagram={workflow.diagramMermaid} preRenderedSvg={workflow.preRenderedSvg} />
               </div>
             )}
           </div>

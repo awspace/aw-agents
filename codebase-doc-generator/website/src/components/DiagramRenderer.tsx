@@ -4,15 +4,34 @@ import { AlertCircle, Loader2 } from 'lucide-react';
 
 interface DiagramRendererProps {
   diagram: string;
+  preRenderedSvg?: string;
 }
 
-const DiagramRenderer: React.FC<DiagramRendererProps> = ({ diagram }) => {
+const DiagramRenderer: React.FC<DiagramRendererProps> = ({ diagram, preRenderedSvg }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!containerRef.current || !diagram) return;
+    if (!containerRef.current) return;
+
+    // Use pre-rendered SVG if available
+    if (preRenderedSvg) {
+      try {
+        setLoading(true);
+        containerRef.current.innerHTML = preRenderedSvg;
+        setError(null);
+        return;
+      } catch (err) {
+        console.error('Failed to use pre-rendered SVG:', err);
+        // Fall through to client-side rendering if pre-rendered SVG fails
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    // Fallback to client-side rendering
+    if (!diagram) return;
 
     const renderDiagram = async () => {
       try {
@@ -47,7 +66,7 @@ const DiagramRenderer: React.FC<DiagramRendererProps> = ({ diagram }) => {
     };
 
     renderDiagram();
-  }, [diagram]);
+  }, [diagram, preRenderedSvg]);
 
   if (loading) {
     return (

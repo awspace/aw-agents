@@ -45,7 +45,7 @@ const Architecture: React.FC<ArchitectureProps> = ({ architecture }) => {
               <div key={index} className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
                 <h3 className="text-lg font-semibold mb-2">{diagram.name}</h3>
                 <p className="text-gray-600 dark:text-gray-300 mb-4">{diagram.description}</p>
-                <DiagramRenderer diagram={diagram.mermaidSyntax} />
+                <DiagramRenderer diagram={diagram.mermaidSyntax} preRenderedSvg={diagram.preRenderedSvg} />
               </div>
             ))}
           </div>
