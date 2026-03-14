@@ -1,6 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react';
-import mermaid from 'mermaid';
-import { AlertCircle, Loader2 } from 'lucide-react';
+import React, { useMemo, useState } from 'react';
+import { Code } from 'lucide-react';
 
 interface DiagramRendererProps {
   diagram: string;
@@ -8,99 +7,48 @@ interface DiagramRendererProps {
 }
 
 const DiagramRenderer: React.FC<DiagramRendererProps> = ({ diagram, preRenderedSvg }) => {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [showRaw, setShowRaw] = useState(false);
 
-  useEffect(() => {
-    if (!containerRef.current) return;
+  // Clean up diagram content
+  const cleanDiagram = useMemo(() => {
+    if (!diagram) return '';
+    return diagram.trim().replace(/^```mermaid\s*/, '').replace(/```$/, '').trim();
+  }, [diagram]);
 
-    // Use pre-rendered SVG if available
-    if (preRenderedSvg) {
-      try {
-        setLoading(true);
-        containerRef.current.innerHTML = preRenderedSvg;
-        setError(null);
-        return;
-      } catch (err) {
-        console.error('Failed to use pre-rendered SVG:', err);
-        // Fall through to client-side rendering if pre-rendered SVG fails
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    // Fallback to client-side rendering
-    if (!diagram) return;
-
-    const renderDiagram = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-
-        const isDarkMode = document.documentElement.classList.contains('dark');
-        mermaid.initialize({
-          startOnLoad: false,
-          theme: isDarkMode ? 'dark' : 'default',
-          securityLevel: 'loose',
-          flowchart: {
-            useMaxWidth: true,
-            htmlLabels: true,
-          },
-        });
-
-        const { svg } = await mermaid.render(
-          `mermaid-diagram-${Math.random().toString(36).substr(2, 9)}`,
-          diagram
-        );
-
-        if (containerRef.current) {
-          containerRef.current.innerHTML = svg;
-        }
-      } catch (err) {
-        console.error('Failed to render Mermaid diagram:', err);
-        setError('Failed to render diagram');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    renderDiagram();
-  }, [diagram, preRenderedSvg]);
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center p-8 bg-gray-50 dark:bg-gray-800 rounded-lg">
-        <Loader2 className="w-6 h-6 animate-spin text-gray-500 dark:text-gray-400 mr-2" />
-        <span className="text-gray-500 dark:text-gray-400">Rendering diagram...</span>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-        <div className="flex items-start">
-          <AlertCircle className="w-5 h-5 text-red-500 dark:text-red-400 mt-0.5 mr-2 flex-shrink-0" />
-          <div>
-            <p className="text-red-800 dark:text-red-300 font-medium">{error}</p>
-            <details className="mt-2 text-sm text-red-700 dark:text-red-400">
-              <summary className="cursor-pointer">View diagram source</summary>
-              <pre className="mt-2 p-2 bg-red-100 dark:bg-red-900/30 rounded text-xs overflow-x-auto">
-                {diagram}
-              </pre>
-            </details>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  // Get safe SVG content
+  const svgContent = (preRenderedSvg || '').trim();
 
   return (
-    <div
-      ref={containerRef}
-      className="mermaid bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm overflow-x-auto"
-    />
+    <>
+      {/* Render SVG if available */}
+      {svgContent ? (
+        <div
+          className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm overflow-x-auto"
+          dangerouslySetInnerHTML={{ __html: svgContent }}
+        />
+      ) : (
+        <div className="p-8 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 text-center">
+          <p className="text-gray-500 dark:text-gray-400 mb-2">Diagram pre-rendered during documentation generation</p>
+          <p className="text-sm text-gray-400 dark:text-gray-500">Regenerate documentation to see this diagram</p>
+        </div>
+      )}
+
+      {/* Raw source toggle */}
+      <div className="mt-2 flex justify-end">
+        <button
+          onClick={() => setShowRaw(!showRaw)}
+          className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 flex items-center gap-1"
+        >
+          <Code size={12} />
+          {showRaw ? 'Hide source' : 'View source'}
+        </button>
+      </div>
+      {showRaw && (
+        <pre className="mt-2 p-3 bg-gray-50 dark:bg-gray-900 rounded text-xs overflow-x-auto font-mono text-gray-900 dark:text-gray-100 border border-gray-200 dark:border-gray-700">
+          {cleanDiagram}
+        </pre>
+      )}
+    </>
   );
 };
 

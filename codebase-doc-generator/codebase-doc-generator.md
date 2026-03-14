@@ -105,13 +105,25 @@ Create these 8 files in `${AGENT_ROOT}/website/public/docs/[unique-doc-id]/`:
 1. `metadata.json` - Project metadata, stats, description
 2. `overview.md` - High-level project overview
 3. `tech-stack.json` - Languages, frameworks, libraries, tools
-4. `architecture.json` - Architecture pattern, Mermaid diagrams, layers (pre-render all diagrams to SVG using `mmdc` command)
+4. `architecture.json` - Architecture pattern, Mermaid diagrams, layers
+   - **MANDATORY PRE-RENDER ALL DIAGRAMS**: For every diagram in `diagrams[]`, run:
+     ```bash
+     # Render Mermaid to SVG
+     PRE_RENDERED_SVG=$(echo "${mermaidSyntax}" | mmdc -o - --theme default --width 1200)
+     ```
+   - Store the output SVG string in `diagrams[].preRenderedSvg` field (no null values allowed)
 5. `components.json` - Component catalog with responsibilities and relationships
 6. `workflows.json` - Execution flows and business processes
+   - **MANDATORY PRE-RENDER ALL DIAGRAMS**: For every workflow in `workflows[]` that has `diagramMermaid`, run:
+     ```bash
+     # Render Mermaid to SVG
+     PRE_RENDERED_SVG=$(echo "${diagramMermaid}" | mmdc -o - --theme default --width 1200)
+     ```
+   - Store the output SVG string in `workflows[].preRenderedSvg` field (no null values allowed)
 7. `deep-dives.json` - In-depth feature analysis with code examples
 8. `setup.md` - Installation, configuration, and usage guide
 
-All content MUST follow the schema definitions later in this document.
+All content MUST follow the schema definitions later in this document. **PRE-RENDER ALL DIAGRAMS - NO NULL VALUES IN preRenderedSvg FIELDS ARE ALLOWED.**
 
 ### Step 6: Update Manifest and Symlink
 Run these commands:
@@ -121,8 +133,8 @@ Run these commands:
 # Update manifest
 cat "${AGENT_ROOT}/website/public/docs/manifest.json" | jq --arg id "[unique-doc-id]" --arg name "[project-name]" --arg desc "[project-description]" --arg date "$(date -I)" \
 '.docSets += [{"id": $id, "name": $name, "description": $desc, "generatedDate": $date, "path": $id}] | .activeDocSet = $id' > "${AGENT_ROOT}/website/public/docs/manifest.tmp" && mv "${AGENT_ROOT}/website/public/docs/manifest.tmp" "${AGENT_ROOT}/website/public/docs/manifest.json"
-# Update symlink
-cd "${AGENT_ROOT}/website/public" && ln -sf "docs/[unique-doc-id]" content
+# Update symlink (remove existing content directory first if it's not a symlink)
+cd "${AGENT_ROOT}/website/public" && [ ! -L content ] && rm -rf content && ln -sf "docs/[unique-doc-id]" content
 ```
 
 ### Step 7: Verify Content Files Exist
@@ -215,7 +227,7 @@ Wait 2 seconds for server to start, then tell the user:
       "name": "string",
       "description": "string",
       "mermaidSyntax": "string",
-      "preRenderedSvg": "string | null"
+      "preRenderedSvg": "string"
     }
   ],
   "layers": [
@@ -227,8 +239,9 @@ Wait 2 seconds for server to start, then tell the user:
   ]
 }
 ```
-- Pre-render all diagrams to SVG using: `echo "mermaid-syntax" | mmdc -o -`
+- PRE-RENDER ALL DIAGRAMS TO SVG MANDATORILY (no client-side rendering): `echo "mermaid-syntax" | mmdc -o -`
 - Place the SVG output in `preRenderedSvg` field
+- ALL diagrams must be pre-rendered, no exceptions
 
 ### 4. components.json (Component Breakdown)
 ```json
@@ -266,7 +279,7 @@ Wait 2 seconds for server to start, then tell the user:
         }
       ],
       "diagramMermaid": "string | null",
-      "preRenderedSvg": "string | null"
+      "preRenderedSvg": "string"
     }
   ]
 }
