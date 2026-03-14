@@ -1,0 +1,28 @@
+{
+  "architecturePattern": "Single-Page Application (SPA) with Component-Based Architecture",
+  "highLevelDescription": "This project follows a modern SPA architecture built with React, featuring a clear separation between UI components, business logic, and data layer. The application is fully client-side, with all content loaded statically from JSON and Markdown files.",
+  "diagrams": [
+    {
+      "name": "High-Level Architecture",
+      "description": "Overview of the system architecture and component relationships",
+      "mermaidSyntax": "graph TD\n    A[User Browser] --> B[React Application]\n    B --> C[UI Components]\n    B --> D[Business Logic]\n    B --> E[Data Layer]\n    E --> F[Static Content Files]\n    F --> G[JSON Data]\n    F --> H[Markdown Content]\n    C --> I[Layout Components]\n    C --> J[Page Components]\n    C --> K[Reusable Components]\n    D --> L[Content Loading Logic]\n    D --> M[Utility Functions]"
+    }
+  ],
+  "layers": [
+    {
+      "name": "Presentation Layer",
+      "responsibility": "Rendering UI components and handling user interactions",
+      "components": ["Layout", "Sidebar", "Pages", "UI Components"]
+    },
+    {
+      "name": "Business Logic Layer",
+      "responsibility": "Handling application logic and data transformation",
+      "components": ["Content Loaders", "Utilities", "Type Definitions"]
+    },
+    {
+      "name": "Data Layer",
+      "responsibility": "Loading and providing access to documentation content",
+      "components": ["JSON Data Files", "Markdown Content Files"]
+    }
+  ]
+}

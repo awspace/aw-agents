@@ -1,0 +1,81 @@
+{
+  "components": [
+    {
+      "id": "app",
+      "name": "App",
+      "type": "component",
+      "location": "src/App.tsx",
+      "responsibility": "Root application component that handles routing and content loading",
+      "keyFiles": ["src/App.tsx"],
+      "dependencies": ["layout", "pages", "content-loader"],
+      "dependents": [],
+      "keyExports": ["default App"]
+    },
+    {
+      "id": "layout",
+      "name": "Layout",
+      "type": "component",
+      "location": "src/components/Layout.tsx",
+      "responsibility": "Main application layout with sidebar and header",
+      "keyFiles": ["src/components/Layout.tsx", "src/components/Sidebar.tsx"],
+      "dependencies": ["sidebar"],
+      "dependents": ["app"],
+      "keyExports": ["default Layout"]
+    },
+    {
+      "id": "sidebar",
+      "name": "Sidebar",
+      "type": "component",
+      "location": "src/components/Sidebar.tsx",
+      "responsibility": "Navigation sidebar with project information",
+      "keyFiles": ["src/components/Sidebar.tsx"],
+      "dependencies": [],
+      "dependents": ["layout"],
+      "keyExports": ["default Sidebar"]
+    },
+    {
+      "id": "content-loader",
+      "name": "Content Loader",
+      "type": "utility",
+      "location": "src/utils/contentLoader.ts",
+      "responsibility": "Utility functions for loading and parsing content files",
+      "keyFiles": ["src/utils/contentLoader.ts"],
+      "dependencies": [],
+      "dependents": ["app", "pages"],
+      "keyExports": ["loadAllContent", "loadMetadata", "loadOverview"]
+    },
+    {
+      "id": "types",
+      "name": "Type Definitions",
+      "type": "module",
+      "location": "src/types/index.ts",
+      "responsibility": "TypeScript type definitions for all content schemas",
+      "keyFiles": ["src/types/index.ts"],
+      "dependencies": [],
+      "dependents": ["app", "pages", "components", "content-loader"],
+      "keyExports": ["Metadata", "TechStack", "Architecture", "Components"]
+    },
+    {
+      "id": "diagram-renderer",
+      "name": "Diagram Renderer",
+      "type": "component",
+      "location": "src/components/DiagramRenderer.tsx",
+      "responsibility": "Renders interactive Mermaid diagrams",
+      "keyFiles": ["src/components/DiagramRenderer.tsx"],
+      "dependencies": [],
+      "dependents": ["architecture-page", "workflows-page"],
+      "keyExports": ["default DiagramRenderer"]
+    },
+    {
+      "id": "code-block",
+      "name": "Code Block",
+      "type": "component",
+      "location": "src/components/CodeBlock.tsx",
+      "responsibility": "Renders syntax-highlighted code blocks",
+      "keyFiles": ["src/components/CodeBlock.tsx"],
+      "dependencies": [],
+      "dependents": ["deep-dives-page"],
+      "keyExports": ["default CodeBlock"]
+    }
+  ]
+}

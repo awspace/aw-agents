@@ -1,0 +1,80 @@
+{
+  "workflows": [
+    {
+      "name": "Application Startup",
+      "description": "The process that occurs when the application is first loaded in the browser",
+      "trigger": "User navigates to the website URL",
+      "steps": [
+        {
+          "stepNumber": 1,
+          "description": "Browser loads the HTML entry point and all assets",
+          "component": "index.html",
+          "action": "Load and parse HTML, CSS, and JavaScript"
+        },
+        {
+          "stepNumber": 2,
+          "description": "React application mounts the root App component",
+          "component": "main.tsx",
+          "action": "Initialize React and render App component"
+        },
+        {
+          "stepNumber": 3,
+          "description": "App component triggers loading of all content files",
+          "component": "App.tsx",
+          "action": "Call loadAllContent() utility function"
+        },
+        {
+          "stepNumber": 4,
+          "description": "Content loader fetches and parses all JSON and Markdown files",
+          "component": "contentLoader.ts",
+          "action": "Fetch and parse content from /content directory"
+        },
+        {
+          "stepNumber": 5,
+          "description": "Content is validated and passed to child components",
+          "component": "App.tsx",
+          "action": "Store content in state and render routes"
+        },
+        {
+          "stepNumber": 6,
+          "description": "Application renders the requested page based on the URL",
+          "component": "React Router",
+          "action": "Match URL to route and render corresponding page"
+        }
+      ],
+      "diagramMermaid": "sequenceDiagram\n    participant User\n    participant Browser\n    participant App\n    participant ContentLoader\n    participant ContentFiles\n    User->>Browser: Navigate to URL\n    Browser->>Browser: Load HTML/CSS/JS\n    Browser->>App: Mount React application\n    App->>ContentLoader: loadAllContent()\n    ContentLoader->>ContentFiles: Fetch metadata.json\n    ContentLoader->>ContentFiles: Fetch overview.md\n    ContentLoader->>ContentFiles: Fetch tech-stack.json\n    ContentLoader->>ContentFiles: Fetch architecture.json\n    ContentLoader->>ContentFiles: Fetch components.json\n    ContentLoader->>ContentFiles: Fetch workflows.json\n    ContentLoader->>ContentFiles: Fetch deep-dives.json\n    ContentLoader->>ContentFiles: Fetch setup.md\n    ContentFiles-->>ContentLoader: Return all content\n    ContentLoader-->>App: Return parsed content data\n    App->>App: Store content in state\n    App->>User: Render requested page"
+    },
+    {
+      "name": "Page Navigation",
+      "description": "The process when a user navigates between different documentation sections",
+      "trigger": "User clicks a navigation link in the sidebar",
+      "steps": [
+        {
+          "stepNumber": 1,
+          "description": "User clicks a navigation link in the sidebar",
+          "component": "Sidebar.tsx",
+          "action": "Handle click event on NavLink"
+        },
+        {
+          "stepNumber": 2,
+          "description": "React Router updates the browser URL and matches the route",
+          "component": "React Router",
+          "action": "Update URL and match to route definition"
+        },
+        {
+          "stepNumber": 3,
+          "description": "Corresponding page component is rendered with preloaded content",
+          "component": "Page Components",
+          "action": "Receive content data as props and render"
+        },
+        {
+          "stepNumber": 4,
+          "description": "Page content is displayed to the user without page reload",
+          "component": "Browser",
+          "action": "Update DOM with new page content"
+        }
+      ],
+      "diagramMermaid": null
+    }
+  ]
+}

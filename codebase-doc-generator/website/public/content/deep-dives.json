@@ -1,0 +1,37 @@
+{
+  "features": [
+    {
+      "name": "Content Loading System",
+      "description": "The content loading system fetches and parses all documentation content from static files",
+      "businessValue": "Enables the application to be completely static and easily deployable to any hosting service. No backend server required.",
+      "implementationOverview": "The content loader uses the Fetch API to retrieve JSON and Markdown files from the /content directory. Markdown files are converted to HTML using the marked library. All content loading happens in parallel for optimal performance.",
+      "keyComponents": ["content-loader", "App"],
+      "codeExamples": [
+        {
+          "filePath": "src/utils/contentLoader.ts",
+          "snippet": "export async function loadAllContent(): Promise<ContentData> {\n  const [\n    metadata,\n    overview,\n    techStack,\n    architecture,\n    components,\n    workflows,\n    deepDives,\n    setup,\n  ] = await Promise.all([\n    loadMetadata(),\n    loadOverview(),\n    loadTechStack(),\n    loadArchitecture(),\n    loadComponents(),\n    loadWorkflows(),\n    loadDeepDives(),\n    loadSetup(),\n  ]);\n\n  return {\n    metadata,\n    overview,\n    techStack,\n    architecture,\n    components,\n    workflows,\n    deepDives,\n    setup,\n  };\n}",
+          "explanation": "This function loads all content in parallel using Promise.all, which significantly improves loading performance compared to sequential loading. Each content type has its own dedicated loader function that handles fetching and parsing for that specific file type."
+        },
+        {
+          "filePath": "src/utils/contentLoader.ts",
+          "snippet": "export async function loadOverview(): Promise<string> {\n  const response = await fetch('/content/overview.md');\n  if (!response.ok) {\n    throw new Error('Failed to load overview');\n  }\n  const markdown = await response.text();\n  return marked(markdown) as string;\n}",
+          "explanation": "Individual loader functions handle specific content types. This Markdown loader fetches the file, converts it to text, and then uses the marked library to parse it into HTML. Proper error handling ensures that any loading failures are caught and reported to the user."
+        }
+      ]
+    },
+    {
+      "name": "Mermaid Diagram Rendering",
+      "description": "Interactive diagram rendering system that converts Mermaid syntax to SVG diagrams",
+      "businessValue": "Provides visual representations of architecture and workflows that are easier to understand than text descriptions. Diagrams are interactive and can be zoomed/panned.",
+      "implementationOverview": "The DiagramRenderer component uses the Mermaid library to render diagrams dynamically. It automatically detects dark/light mode and adjusts the diagram theme accordingly. Error handling ensures that invalid diagram syntax is gracefully handled.",
+      "keyComponents": ["diagram-renderer"],
+      "codeExamples": [
+        {
+          "filePath": "src/components/DiagramRenderer.tsx",
+          "snippet": "useEffect(() => {\n  if (!containerRef.current || !diagram) return;\n\n  const renderDiagram = async () => {\n    try {\n      setLoading(true);\n      setError(null);\n\n      const isDarkMode = document.documentElement.classList.contains('dark');\n      mermaid.initialize({\n        startOnLoad: false,\n        theme: isDarkMode ? 'dark' : 'default',\n        securityLevel: 'loose',\n        flowchart: {\n          useMaxWidth: true,\n          htmlLabels: true,\n        },\n      });\n\n      const { svg } = await mermaid.render(\n        `mermaid-diagram-${Math.random().toString(36).substr(2, 9)}`,\n        diagram\n      );\n\n      if (containerRef.current) {\n        containerRef.current.innerHTML = svg;\n      }\n    } catch (err) {\n      console.error('Failed to render Mermaid diagram:', err);\n      setError('Failed to render diagram');\n    } finally {\n      setLoading(false);\n    }\n  };\n\n  renderDiagram();\n}, [diagram]);",
+          "explanation": "This effect handles the diagram rendering process. It initializes Mermaid with the appropriate theme based on the current color mode, renders the diagram to SVG, and inserts it into the DOM. The effect re-runs whenever the diagram content changes, ensuring updates are reflected immediately."
+        }
+      ]
+    }
+  ]
+}
