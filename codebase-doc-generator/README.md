@@ -1,131 +1,135 @@
 # codebase-doc-generator Agent
 
-Generates comprehensive interactive documentation websites for codebases, designed for learning and onboarding purposes.
+A Claude Code agent that generates comprehensive interactive documentation websites for any codebase, designed for learning and onboarding purposes.
 
-## Overview
+## ✨ Features
+- 🔍 **Full codebase analysis** - Automatically scans and understands any codebase structure
+- 📚 **Interactive documentation website** - Prebuilt Vite + React site with modern UI
+- 🎨 **Diagram support** - Auto-generates and pre-renders Mermaid architecture diagrams
+- 💻 **Syntax highlighting** - Beautiful code examples for key features
+- 🌓 **Dark/light mode** - Comfortable viewing in any environment
+- 📱 **Fully responsive** - Works on desktop, tablet, and mobile
+- 📦 **Multi-documentation support** - Keep docs for all your projects in one place, no re-analysis needed
+- ⚡ **Instant loading** - Pre-rendered content and diagrams for fast performance
+- 🚀 **Zero setup** - Works out of the box after installation
 
-This agent creates a two-part system:
-1. A prebuilt TypeScript static documentation website (Vite + React) that renders structured content
-2. An intelligent agent that analyzes codebases and generates the content files the website consumes
+## 🚀 Quick Start
 
-The generated documentation includes:
-- Project overview and statistics
-- Technology stack breakdown
-- Architecture diagrams and descriptions
-- Component catalog with relationships
-- Workflow/execution flow documentation
-- Deep dives into key features with code examples
-- Complete setup and usage guide
+### 1. Install the Agent
+1. Clone or copy this repository to your Claude Code agents directory:
+   ```bash
+   git clone https://github.com/awspace/aw-agents.git
+   cp -r aw-agents/codebase-doc-generator ~/.claude/agents/
+   ```
 
-## Features
+2. **Fully quit and restart Claude Code** (Cmd+Q on Mac / Alt+F4 on Windows) to detect the new agent.
 
-### Agent Capabilities
-- 🔍 Full codebase analysis and structure mapping
-- 📝 Automatic content generation following strict schemas
-- 🎨 Automatic website dependency installation
-- 🏗️ Static website build and optimization
-- 🌐 Local development server with live preview
-- 📦 Export built website for deployment
+### 2. Generate Documentation
+Open Claude Code in the root directory of the project you want to document, then run:
+```
+Use the codebase-doc-generator agent to generate documentation for this project and serve it locally
+```
 
-### Website Features
-- 📱 Fully responsive design (desktop + mobile)
-- 🌓 Dark/light mode support
-- 📊 Interactive Mermaid diagram rendering
-- 💅 Syntax-highlighted code examples
-- 🔍 Full-text search across all documentation
-- 🧭 Intuitive navigation between sections
-- ⚡ Fast static build with Vite
+The agent will automatically:
+- Scan and analyze your codebase
+- Generate all structured content files
+- Build the documentation website
+- Start a local server at `http://localhost:3421/`
+- Provide you with a clickable URL to view your documentation
 
-## Usage
+## 📖 Usage Examples
 
 ### Basic Usage
 ```
 Generate documentation for this codebase
 ```
+Generates all content files but doesn't start the server.
 
-### Generate and Preview
+### Generate and View
 ```
-Generate documentation and serve it locally
+Generate documentation for this project and serve it locally
 ```
+Generates content, builds the site, and starts a local server for immediate viewing.
 
 ### Export for Deployment
 ```
-Export the documentation to ./docs folder
+Generate documentation and export the built site to ./docs folder
 ```
+Builds the static site and exports it to your specified directory for deployment to Vercel, Netlify, GitHub Pages, etc.
 
-## Directory Structure
+### Use Existing Documentation
+If the agent detects existing documentation for your project, it will ask if you want to use the existing version or regenerate it, saving you time on re-analysis.
 
+## 📁 What Gets Generated
+
+The agent produces 8 structured content files that power the documentation website:
+
+| File | Purpose |
+|------|---------|
+| `metadata.json` | Project name, description, statistics, generation date |
+| `overview.md` | High-level project overview and goals |
+| `tech-stack.json` | Complete breakdown of languages, frameworks, libraries, and tools |
+| `architecture.json` | System architecture description + pre-rendered Mermaid diagrams |
+| `components.json` | Catalog of all major components with responsibilities and relationships |
+| `workflows.json` | Step-by-step execution flows and business processes |
+| `deep-dives.json` | In-depth analysis of key features with code examples |
+| `setup.md` | Complete installation, configuration, and usage guide |
+
+## 🔧 Requirements
+- Claude Code (latest version)
+- Node.js 18+ (automatically installed by the agent on first run if missing)
+- No other dependencies required - the agent handles all setup automatically
+
+## 🗂️ Multi-Documentation Management
+All your generated documentation is stored permanently in:
 ```
-codebase-doc-generator/
-├── codebase-doc-generator.md       # Agent definition
-├── README.md                       # This file
-└── website/                        # Prebuilt documentation website
-    ├── package.json
-    ├── tsconfig.json
-    ├── vite.config.ts
-    ├── src/
-    │   ├── App.tsx                 # Root application
-    │   ├── main.tsx                # Entry point
-    │   ├── components/             # Reusable UI components
-    │   ├── pages/                  # Section pages
-    │   ├── types/                  # TypeScript type definitions
-    │   ├── utils/                  # Helper functions
-    │   └── index.css               # Global styles
-    └── public/
-        └── content/                # Generated content (agent output)
-            ├── metadata.json       # Project metadata
-            ├── overview.md         # High-level overview
-            ├── tech-stack.json     # Technology stack
-            ├── architecture.json   # Architecture details
-            ├── components.json     # Component catalog
-            ├── workflows.json      # Workflow documentation
-            ├── deep-dives.json     # Feature deep dives
-            └── setup.md            # Setup guide
+~/.claude/agents/codebase-doc-generator/website/public/docs/
 ```
+Each project gets its own dedicated folder with a unique ID. You can:
+- Switch between different project docs instantly using the dropdown selector in the website header
+- Keep multiple versions of documentation as your codebase evolves
+- Share entire doc folders with team members
+- Delete old documentation sets you no longer need
 
-## Content Schema
+## 🎯 Supported Languages & Frameworks
+The agent works with any codebase, including but not limited to:
+- **Languages**: Python, TypeScript/JavaScript, Go, Rust, Java, C#, Ruby, PHP
+- **Frameworks**: React, Vue, Angular, Next.js, Django, Flask, FastAPI, Spring, Express
+- **Architectures**: Monoliths, microservices, serverless, CLI tools, libraries
 
-All generated content follows strict schemas to ensure compatibility with the website. See `codebase-doc-generator.md` for complete schema specifications.
+## 🐛 Troubleshooting
 
-## Development
+### Agent not detected after installation
+- Make sure you copied the entire `codebase-doc-generator` folder to `~/.claude/agents/`
+- Fully quit and restart Claude Code (closing the window isn't enough - use Cmd+Q / Alt+F4)
+- Run `/agents` in Claude Code to see if it appears in the list
 
-### Website Development
-```bash
-cd website
-npm install
-npm run dev          # Start development server
-npm run build        # Build for production
-npm run preview      # Preview production build
-npm run typecheck    # Run TypeScript checks
-```
+### Documentation website doesn't load
+- Check that port 3421 is not being used by another application
+- Verify the content symlink points to a valid doc set: `~/.claude/agents/codebase-doc-generator/website/public/content`
+- Check the browser console for errors
 
-### Adding New Features
-1. Update the type definitions in `src/types/index.ts`
-2. Add content loader functions in `src/utils/contentLoader.ts`
-3. Create new page components in `src/pages/`
-4. Add navigation in `src/components/Sidebar.tsx`
-5. Update routes in `src/App.tsx`
-6. Update the agent definition to generate the new content type
+### Diagrams don't render
+- The agent pre-renders all diagrams to SVG for instant loading, so this shouldn't happen
+- If you see errors, the agent will fall back to client-side rendering automatically
 
-## Technology Stack
+### Slow generation on first run
+- The agent installs Node.js dependencies on first run only - subsequent runs are much faster
+- Large codebases (>100k LOC) may take a few minutes to analyze fully
 
-### Website
-- **React 18** - UI framework
-- **TypeScript** - Type safety
-- **Vite** - Build tool and dev server
-- **Tailwind CSS** - Utility-first styling
-- **React Router** - Client-side routing
-- **Mermaid** - Diagram rendering
-- **React Syntax Highlighter** - Code highlighting
-- **Lucide React** - Icon library
-- **Marked** - Markdown parsing
+## 🤝 Contributing
+Contributions are welcome! Some areas for improvement:
+- Add support for more programming languages and frameworks
+- Improve diagram generation accuracy
+- Add search functionality across documentation
+- Add export to PDF functionality
+- Improve content generation quality
 
-### Agent
-- **Glob/Grep** - Codebase scanning and analysis
-- **Read/Write** - File operations
-- **Bash** - Command execution for building website
-- **WebSearch** - Supplementary project information
+## 📝 Notes
+- This agent is for **educational and documentation purposes only**
+- All content generation happens locally on your machine
+- No code is sent to external servers unless you use WebSearch functionality
+- Generated documentation is stored locally and never uploaded anywhere
 
-## License
-
-MIT
+## 📄 License
+MIT License - feel free to use this agent for personal or commercial projects.
