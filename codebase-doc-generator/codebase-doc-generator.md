@@ -106,7 +106,7 @@ if ! command -v mmdc &> /dev/null; then
 fi
 ```
 
-## IMPORTANT: JSON Construction Rules
+### IMPORTANT: JSON Construction Rules
 
 1. **NEVER manually build JSON strings containing code snippets.** If you do this, double quotes inside code will not be escaped and break JSON parsing.
 2. **ALWAYS use proper JSON serialization.** After constructing the data structure, output it using:
@@ -129,20 +129,46 @@ Create these 8 files in `${AGENT_ROOT}/website/public/docs/[unique-doc-id]/`:
 2. `overview.md` - High-level project overview
 3. `tech-stack.json` - Languages, frameworks, libraries, tools
 4. `architecture.json` - Architecture pattern, Mermaid diagrams, layers
-   - **MANDATORY PRE-RENDER ALL DIAGRAMS**: For every diagram in `diagrams[]`, run:
-     ```bash
-     # Render Mermaid to SVG
-     PRE_RENDERED_SVG=$(echo "${mermaidSyntax}" | mmdc -o - --theme default --width 1200)
-     ```
-   - Store the output SVG string in `diagrams[].preRenderedSvg` field (no null values allowed)
+   - **MANDATORY PRE-RENDER ALL DIAGRAMS**: For every diagram in `diagrams[]`:
+     1. Save mermaid syntax to an individual .mmd file (preserves source for debugging):
+        ```bash
+        DIAGRAM_ID=$(echo "${name}" | tr '[:upper:]' '[:lower:]' | tr ' ' '-')
+        echo "${mermaidSyntax}" > "${OUTPUT_DIR}/${DIAGRAM_ID}.mmd"
+        ```
+     2. Render with mmdc:
+        ```bash
+        if ! mmdc -i "${OUTPUT_DIR}/${DIAGRAM_ID}.mmd" -o "${OUTPUT_DIR}/${DIAGRAM_ID}.svg" -b white --theme default --width 1200; then
+          echo "ERROR: Failed to render diagram ${name} from ${OUTPUT_DIR}/${DIAGRAM_ID}.mmd"
+          exit 1
+        fi
+        ```
+     3. Minify SVG (remove newlines) for embedding in JSON:
+        ```bash
+        PRE_RENDERED_SVG=$(tr -d '\n\r' < "${OUTPUT_DIR}/${DIAGRAM_ID}.svg")
+        ```
+     4. Store the output SVG string in `diagrams[].preRenderedSvg` field
+   - **No empty or null values allowed** - ALL diagrams must have pre-rendered SVG
 5. `components.json` - Component catalog with responsibilities and relationships
 6. `workflows.json` - Execution flows and business processes
-   - **MANDATORY PRE-RENDER ALL DIAGRAMS**: For every workflow in `workflows[]` that has `diagramMermaid`, run:
-     ```bash
-     # Render Mermaid to SVG
-     PRE_RENDERED_SVG=$(echo "${diagramMermaid}" | mmdc -o - --theme default --width 1200)
-     ```
-   - Store the output SVG string in `workflows[].preRenderedSvg` field (no null values allowed)
+   - **MANDATORY PRE-RENDER ALL DIAGRAMS**: For every workflow in `workflows[]` that has `diagramMermaid`:
+     1. Save mermaid syntax to an individual .mmd file (preserves source for debugging):
+        ```bash
+        DIAGRAM_ID=$(echo "${name}" | tr '[:upper:]' '[:lower:]' | tr ' ' '-')
+        echo "${diagramMermaid}" > "${OUTPUT_DIR}/${DIAGRAM_ID}.mmd"
+        ```
+     2. Render with mmdc:
+        ```bash
+        if ! mmdc -i "${OUTPUT_DIR}/${DIAGRAM_ID}.mmd" -o "${OUTPUT_DIR}/${DIAGRAM_ID}.svg" -b white --theme default --width 1200; then
+          echo "ERROR: Failed to render workflow diagram ${name} from ${OUTPUT_DIR}/${DIAGRAM_ID}.mmd"
+          exit 1
+        fi
+        ```
+     3. Minify SVG (remove newlines) for embedding in JSON:
+        ```bash
+        PRE_RENDERED_SVG=$(tr -d '\n\r' < "${OUTPUT_DIR}/${DIAGRAM_ID}.svg")
+        ```
+     4. Store the output SVG string in `workflows[].preRenderedSvg` field
+   - **No empty or null values allowed** - ALL diagrams must have pre-rendered SVG
 7. `deep-dives.json` - In-depth feature analysis with code examples
 8. `setup.md` - Installation, configuration, and usage guide
 
@@ -262,8 +288,8 @@ Wait 2 seconds for server to start, then tell the user:
   ]
 }
 ```
-- PRE-RENDER ALL DIAGRAMS TO SVG MANDATORILY (no client-side rendering): `echo "mermaid-syntax" | mmdc -o -`
-- Place the SVG output in `preRenderedSvg` field
+- PRE-RENDER ALL DIAGRAMS TO SVG MANDATORILY (no client-side rendering): Follow the standard diagram pre-rendering process that saves mermaid syntax to .mmd files first, then renders with mmdc, then minifies the SVG output
+- Place the minified SVG output in `preRenderedSvg` field
 - ALL diagrams must be pre-rendered, no exceptions
 
 ### 4. components.json (Component Breakdown)
