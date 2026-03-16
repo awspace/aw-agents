@@ -255,14 +255,14 @@ echo "✓ All validation checks passed!"
 
 **Important:** If any check fails, stop immediately and fix the issue. Do not proceed to serving with invalid content.
 
-### Step 7: Verify Content Files Exist
-Run these commands to confirm all files were created:
+### Step 7: List Content Files (Informational)
+Run these commands to visually confirm all files were created:
 ```bash
 # Auto-detect agent root if not already set
 [ -z "$AGENT_ROOT" ] && AGENT_ROOT="$(find ~ -name "codebase-doc-generator.md" 2>/dev/null | grep -E "codebase-doc-generator/codebase-doc-generator.md" | head -1 | xargs dirname 2>/dev/null || echo "$HOME/.claude/agents/codebase-doc-generator")"
 ls -la "${AGENT_ROOT}/website/public/docs/[unique-doc-id]/"
 ```
-Verify all 8 files exist and are not empty.
+All validation is already done in Step 6a - this is just for visual confirmation.
 
 ### Step 8: Build and Serve Website
 Change directory to the prebuilt website and serve:
@@ -439,6 +439,8 @@ Wait 2 seconds for server to start, then tell the user:
 ❌ DO NOT use relative paths like `./website/` without first cd'ing to the agent directory
 
 ## Troubleshooting
+- If any step fails, stop immediately and report the failure to the user. Do not continue generation with partial content - this leads to empty fields that cause errors later.
+- JSON validation failure must be fixed immediately before proceeding. Never continue with invalid JSON.
+- Diagram rendering failures must be fixed immediately before proceeding. Never continue with empty SVG fields.
 - If server fails to start: check port 3421 is not in use, try `npm run build && npm run preview` instead
 - If content doesn't load: verify the symlink points to the correct doc set directory
-- If diagram rendering fails: include the raw mermaid syntax and set preRenderedSvg to null
