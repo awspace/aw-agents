@@ -95,6 +95,29 @@ cd ~/.claude/agents/codebase-doc-generator/website
 - Count total files: `find . -type f -name "*.py" -o -name "*.ts" -o -name "*.tsx" | wc -l`
 
 ### Step 5: Generate Content Files
+
+### Before generating content: Verify mermaid-cli is available
+```bash
+if ! command -v mmdc &> /dev/null; then
+  echo "ERROR: mermaid-cli (mmdc) is not available. Please install it with:"
+  echo "  npm install -g @mermaid-js/mermaid-cli"
+  echo "Generation cannot proceed without mermaid-cli for diagram pre-rendering."
+  exit 1
+fi
+```
+
+## IMPORTANT: JSON Construction Rules
+
+1. **NEVER manually build JSON strings containing code snippets.** If you do this, double quotes inside code will not be escaped and break JSON parsing.
+2. **ALWAYS use proper JSON serialization.** After constructing the data structure, output it using:
+   - JavaScript: `JSON.stringify()`
+   - Python: `json.dumps()`
+3. If you are unsure, always validate and fix escaping after writing any JSON file using:
+   ```bash
+   # Re-serialize to automatically escape all quotes and special characters
+   node -e "import fs from 'fs'; const d = JSON.parse(fs.readFileSync('your-file.json', 'utf8')); fs.writeFileSync('your-file.json', JSON.stringify(d, null, 2), 'utf8');"
+   ```
+
 Define the agent root first:
 ```bash
 # Auto-detect agent root if not already set
