@@ -6,6 +6,8 @@ A Claude Code agent that generates comprehensive interactive documentation websi
 - 🔍 **Full codebase analysis** - Automatically scans and understands any codebase structure
 - 📚 **Interactive documentation website** - Prebuilt Vite + React site with modern UI
 - 🎨 **Diagram support** - Auto-generates and pre-renders Mermaid architecture diagrams
+- 🔍 **Zoomable diagrams** - Click or press Zoom to view large diagrams full-screen in a popup
+- ⬇️ **Download diagrams** - Download any diagram as SVG file to your computer
 - 💻 **Syntax highlighting** - Beautiful code examples for key features
 - 🌓 **Dark/light mode** - Comfortable viewing in any environment
 - 📱 **Fully responsive** - Works on desktop, tablet, and mobile
