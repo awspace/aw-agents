@@ -123,8 +123,9 @@ Define the agent root first:
 # Auto-detect agent root if not already set
 [ -z "$AGENT_ROOT" ] && AGENT_ROOT="$(find ~ -name "codebase-doc-generator.md" 2>/dev/null | grep -E "codebase-doc-generator/codebase-doc-generator.md" | head -1 | xargs dirname 2>/dev/null || echo "$HOME/.claude/agents/codebase-doc-generator")"
 mkdir -p "${AGENT_ROOT}/website/public/docs/[unique-doc-id]"
+OUTPUT_DIR="${AGENT_ROOT}/website/public/docs/[unique-doc-id]"
 ```
-Create these 8 files in `${AGENT_ROOT}/website/public/docs/[unique-doc-id]/`:
+Create these 8 files in `${OUTPUT_DIR}/`:
 1. `metadata.json` - Project metadata, stats, description
 2. `overview.md` - High-level project overview
 3. `tech-stack.json` - Languages, frameworks, libraries, tools
@@ -174,6 +175,26 @@ Create these 8 files in `${AGENT_ROOT}/website/public/docs/[unique-doc-id]/`:
 
 All content MUST follow the schema definitions later in this document. **PRE-RENDER ALL DIAGRAMS - NO NULL VALUES IN preRenderedSvg FIELDS ARE ALLOWED.**
 
+### Step 5a: Validate All JSON Files (MANDATORY)
+After generating all JSON files, validate them with `jq` to ensure they're valid JSON:
+```bash
+for file in "${OUTPUT_DIR}"/*.json; do
+  if ! jq . "$file" > /dev/null; then
+    echo "ERROR: $file contains invalid JSON. Attempting automatic fix..."
+    # Fix by re-serializing with JSON.stringify which automatically escapes everything
+    node -e "import fs from 'fs'; const d = JSON.parse(fs.readFileSync('$file', 'utf8')); fs.writeFileSync('$file', JSON.stringify(d, null, 2), 'utf8');"
+    # Check if fix worked
+    if ! jq . "$file" > /dev/null; then
+      echo "ERROR: Automatic fix failed. Please fix $file manually before proceeding."
+      exit 1
+    fi
+    echo "✓ Fixed $file successfully"
+  fi
+done
+```
+
+This step catches unescaped quotes automatically. Always pass after this step - never proceed with invalid JSON.
+
 ### Step 6: Update Manifest and Symlink
 Run these commands:
 ```bash
@@ -184,6 +205,10 @@ cat "${AGENT_ROOT}/website/public/docs/manifest.json" | jq --arg id "[unique-doc
 '.docSets += [{"id": $id, "name": $name, "description": $desc, "generatedDate": $date, "path": $id}] | .activeDocSet = $id' > "${AGENT_ROOT}/website/public/docs/manifest.tmp" && mv "${AGENT_ROOT}/website/public/docs/manifest.tmp" "${AGENT_ROOT}/website/public/docs/manifest.json"
 # Update symlink (remove existing content directory first if it's not a symlink)
 cd "${AGENT_ROOT}/website/public" && [ ! -L content ] && rm -rf content && ln -sf "docs/[unique-doc-id]" content
+# Also copy all files to the default content directory (used by fallback routing)
+# This ensures the site works regardless of which path is used
+mkdir -p "${AGENT_ROOT}/website/public/content"
+cp -f "${AGENT_ROOT}/website/public/docs/${uniqueDocId}"/* "${AGENT_ROOT}/website/public/content/"
 ```
 
 ### Step 7: Verify Content Files Exist
