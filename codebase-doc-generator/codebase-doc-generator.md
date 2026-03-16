@@ -208,8 +208,52 @@ cd "${AGENT_ROOT}/website/public" && [ ! -L content ] && rm -rf content && ln -s
 # Also copy all files to the default content directory (used by fallback routing)
 # This ensures the site works regardless of which path is used
 mkdir -p "${AGENT_ROOT}/website/public/content"
-cp -f "${AGENT_ROOT}/website/public/docs/${uniqueDocId}"/* "${AGENT_ROOT}/website/public/content/"
+cp -f "${AGENT_ROOT}/website/public/docs/[unique-doc-id]"/* "${AGENT_ROOT}/website/public/content/"
 ```
+
+### Step 6a: End-to-End Content Validation (MANDATORY)
+Verify all requirements are met before proceeding to build and serve:
+
+```bash
+# 1. Check all 8 expected files exist and are non-empty
+EXPECTED_FILES=("metadata.json" "overview.md" "tech-stack.json" "architecture.json" "components.json" "workflows.json" "deep-dives.json" "setup.md")
+for file in "${EXPECTED_FILES[@]}"; do
+  if [ ! -f "${AGENT_ROOT}/website/public/docs/[unique-doc-id}/${file}" ]; then
+    echo "ERROR: Missing expected file: ${file}"
+    exit 1
+  fi
+  if [ ! -s "${AGENT_ROOT}/website/public/docs/[unique-doc-id}/${file}" ]; then
+    echo "ERROR: File is empty (indicates generation failure): ${file}"
+    exit 1
+  fi
+done
+
+# 2. Re-validate all JSON files (already checked once, double-check after copying)
+for file in "${AGENT_ROOT}/website/public/docs/[unique-doc-id]"/*.json; do
+  if ! jq . "$file" > /dev/null; then
+    echo "ERROR: Invalid JSON after validation: $file"
+    exit 1
+  fi
+done
+
+# 3. Verify all diagrams have non-empty preRenderedSvg
+set +o errexit
+# Check architecture.json
+if jq -e '.diagrams[].preRenderedSvg == ""' "${AGENT_ROOT}/website/public/docs/[unique-doc-id]/architecture.json" > /dev/null 2>&1; then
+  echo "ERROR: Found empty preRenderedSvg in architecture.json - all diagrams must be pre-rendered"
+  exit 1
+fi
+# Check workflows.json
+if jq -e '.workflows[] | select(.diagramMermaid != null) | .preRenderedSvg == ""' "${AGENT_ROOT}/website/public/docs/[unique-doc-id]/workflows.json" > /dev/null 2>&1; then
+  echo "ERROR: Found empty preRenderedSvg in workflows.json - all diagrams must be pre-rendered"
+  exit 1
+fi
+set -o errexit
+
+echo "✓ All validation checks passed!"
+```
+
+**Important:** If any check fails, stop immediately and fix the issue. Do not proceed to serving with invalid content.
 
 ### Step 7: Verify Content Files Exist
 Run these commands to confirm all files were created:
